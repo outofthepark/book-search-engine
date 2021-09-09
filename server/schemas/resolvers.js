@@ -50,10 +50,6 @@ const resolvers = {
         },
         saveBook: async (parent, {bookId, title, authors, description, image, link}, context) => {
             if (context.user) {
-                console.log(bookId);
-                console.log(title);
-                console.log(description);
-                console.log(authors);
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { savedBooks: { bookId: bookId, title: title, authors: authors, description: description, image: image, link: link } } },
@@ -61,7 +57,6 @@ const resolvers = {
                     .select('-__v -password')
                     .populate('savedBooks');
 
-                    console.log(updatedUser);
                 return updatedUser;
             }
             throw new AuthenticationError('You need to be logged in!');
@@ -75,6 +70,7 @@ const resolvers = {
                     .select('-__v -password')
                     .populate('savedBooks');
             }
+            throw new AuthenticationError('You need to be logged in!');
         }
     }
   };
