@@ -1,6 +1,7 @@
 const { User, Book} = require('../models');
 const { AuthenticationError } = require('apollo-server-express');
 const { signToken } = require('../utils/auth');
+const { isInputObjectType } = require('graphql');
 
 const resolvers = {
     Query: {
@@ -22,20 +23,6 @@ const resolvers = {
             return User.findOne({ username :username })
                 .select('-__v -password')
                 .populate('savedBooks');
-        },
-        meetings: async () => {
-            return Meeting.find()
-                .select('-__v')
-                .populate('invitees')
-                .populate('host')
-                .populate('recordKeeper');
-        },
-        meeting: async (parent, { _id }) => {
-            return Meeting.findById({ _id })
-                .select('-__v' )
-                .populate('invitees')
-                .populate('host')
-                .populate('recordKeeper');
         }
     },
     Mutation: {
@@ -61,22 +48,30 @@ const resolvers = {
             const token = signToken(user);
             return { token, user };
         },
-        saveBook: async (parent, {bookInput}, context) => {
+        saveBook: async (parent, {bookId, title, authors, description, image, link}, context) => {
             if (context.user) {
-                return updatedUser = await User.findOneAndUpdate(
+                console.log(bookId);
+                console.log(title);
+                console.log(description);
+                console.log(authors);
+                const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $push: { savedBooks: bookInput} },
-                    { new: true })
+                    { $addToSet: { savedBooks: { bookId: bookId, title: title, authors: authors, description: description, image: image, link: link } } },
+                    { new: true, runValidators: true  })
                     .select('-__v -password')
                     .populate('savedBooks');
+
+                    console.log(updatedUser);
+                return updatedUser;
             }
+            throw new AuthenticationError('You need to be logged in!');
         },
-        removeBook: async (parent, {id}, context) => {
+        removeBook: async (parent, {bookId}, context) => {
             if (context.user) {
                 return updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
-                    { $pull: { savedBooks: { bookId: id} } },
-                    { new: true })
+                    { $pull: { savedBooks: { bookId: bookId} } },
+                    { new: true, upsert: true})
                     .select('-__v -password')
                     .populate('savedBooks');
             }

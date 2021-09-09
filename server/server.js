@@ -5,7 +5,7 @@ const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 const { authMiddleware } = require('./utils/auth');
 
-const PORT = process.env.PORT || 3500;
+const PORT = process.env.PORT || 3001;
 const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
