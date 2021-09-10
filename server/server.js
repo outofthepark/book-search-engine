@@ -10,11 +10,6 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
-});
-
 async function startApolloServer(typeDefs, resolvers, middleware){ 
 
   const server = new ApolloServer({ typeDefs, resolvers, context: middleware });
@@ -34,5 +29,9 @@ async function startApolloServer(typeDefs, resolvers, middleware){
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 }
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
 
 startApolloServer(typeDefs, resolvers, authMiddleware);
