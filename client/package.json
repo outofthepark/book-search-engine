@@ -1,5 +1,6 @@
 {
   "name": "client",
+  "homepage": "https://protected-brushlands-21269.herokuapp.com/",
   "version": "0.1.0",
   "private": true,
   "proxy": "http://localhost:3001",
